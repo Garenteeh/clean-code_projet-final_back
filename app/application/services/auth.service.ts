@@ -13,12 +13,12 @@ export interface AuthResult {
   error?: string
 }
 
-export interface IAuthService {
+export interface AuthServiceInterface {
   verifyToken(token: string): Promise<AuthResult>
   isAuthenticated(token: string | undefined): Promise<boolean>
 }
 
-export class AuthService implements IAuthService {
+export class AuthService implements AuthServiceInterface {
   /**
    * Vérifie la validité d'un token d'authentification
    *
