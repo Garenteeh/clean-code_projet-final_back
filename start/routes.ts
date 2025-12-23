@@ -12,7 +12,6 @@ import { middleware } from '#start/kernel'
 
 router.get('/', async () => 'It works!')
 
-
 router
   .get('/protected', async ({ auth, response }) => {
     return response.ok({

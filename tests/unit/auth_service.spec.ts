@@ -1,5 +1,5 @@
 import { test } from '@japa/runner'
-import { AuthService } from '#application/services/AuthService'
+import { AuthService } from '#application/services/auth.service'
 
 /**
  * Tests unitaires pour AuthService
