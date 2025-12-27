@@ -1,6 +1,4 @@
-import { AuthService } from '#application/services/auth.service'
-
-const authService = new AuthService()
+import { User } from '#domain/entities/user'
 
 type HttpContext = {
   request: {
@@ -9,7 +7,6 @@ type HttpContext = {
   response: {
     badRequest: (data: any) => any
     ok: (data: any) => any
-    internalServerError: (data: any) => any
   }
 }
 
@@ -23,20 +20,15 @@ export default class AuthController {
       })
     }
 
-    try {
-      const { token, user } = await authService.login(username, password)
+    const user = new User(username, username)
+    const token = `Bearer ${username}`
 
-      return response.ok({
-        token,
-        user: {
-          id: user.id,
-          username: user.username,
-        },
-      })
-    } catch (error) {
-      return response.internalServerError({
-        error: 'Erreur lors de la connexion',
-      })
-    }
+    return response.ok({
+      token,
+      user: {
+        id: user.id,
+        username: user.username,
+      },
+    })
   }
 }
