@@ -29,10 +29,17 @@ export default class CardRepository implements CardRepositoryPort {
     return card
   }
 
-  async findCardsForQuiz(userId: string, _date: Date): Promise<Card[]> {
-    return Array.from(this.cards.values()).filter(
-      (card) => card.userId === userId && card.category.value !== Category.DONE
-    )
+  async findCardsForQuiz(userId: string, date: Date): Promise<Card[]> {
+    const targetDate = new Date(date)
+    targetDate.setHours(23, 59, 59, 999)
+
+    return Array.from(this.cards.values()).filter((card) => {
+      if (card.userId !== userId) return false
+
+      if (card.category.value === Category.DONE) return false
+
+      return card.nextReviewDate <= targetDate
+    })
   }
 
   async update(card: Card): Promise<Card> {
