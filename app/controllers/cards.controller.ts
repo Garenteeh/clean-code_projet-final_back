@@ -1,8 +1,7 @@
 import { CardService } from '#application/services/card.service'
 import CardRepository from '#infrastructure/adapters/repositories/card_repository'
 
-const cardRepository = new CardRepository()
-const cardService = new CardService(cardRepository)
+const cardService = new CardService(CardRepository)
 
 type HttpContext = {
   request: {
