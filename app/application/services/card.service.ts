@@ -15,7 +15,7 @@ export class CardService {
     const cardId = new CardId(crypto.randomUUID())
     const category = new CategoryValueObject(Category.FIRST)
 
-    const card = new Card(cardId, question, answer, tag, category, userId)
+    const card = new Card(cardId, question, answer, tag, category, userId, undefined)
     return await this.cardRepository.save(card)
   }
 
@@ -36,10 +36,8 @@ export class CardService {
       throw new Error('Card not found')
     }
 
-    // Logique simplifiée du système Leitner
     let newCategory: Category
     if (isValid) {
-      // Si bonne réponse, passer à la catégorie suivante
       const currentCategory = card.category.value
       const categories = Object.values(Category)
       const currentIndex = categories.indexOf(currentCategory)
@@ -49,7 +47,6 @@ export class CardService {
         newCategory = Category.DONE
       }
     } else {
-      // Si mauvaise réponse, revenir à la première catégorie
       newCategory = Category.FIRST
     }
 
@@ -59,7 +56,8 @@ export class CardService {
       card.answer,
       card.tag,
       new CategoryValueObject(newCategory),
-      card.userId
+      card.userId,
+      new Date()
     )
 
     return await this.cardRepository.update(updatedCard)

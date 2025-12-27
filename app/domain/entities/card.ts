@@ -8,7 +8,8 @@ export class Card {
     public readonly answer: string,
     public readonly tag: string | undefined,
     public readonly category: CategoryValueObject,
-    public readonly userId: string
+    public readonly userId: string,
+    public readonly lastReviewedAt: Date | undefined = undefined
   ) {}
 
   toJSON() {

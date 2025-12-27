@@ -1,11 +1,18 @@
 import { Card } from '#domain/entities/card'
 import { CardRepositoryPort } from '#domain/ports/card_repository'
+import { LeitnerSchedulerService } from '#domain/services/leitner_scheduler.service'
 
 export class QuizService {
-  constructor(private cardRepository: CardRepositoryPort) {}
+  private leitnerScheduler: LeitnerSchedulerService
+
+  constructor(private cardRepository: CardRepositoryPort) {
+    this.leitnerScheduler = new LeitnerSchedulerService()
+  }
 
   async getCardsForQuiz(userId: string, date?: Date): Promise<Card[]> {
     const quizDate = date || new Date()
-    return await this.cardRepository.findCardsForQuiz(userId, quizDate)
+    const allUserCards = await this.cardRepository.findCardsForQuiz(userId, quizDate)
+
+    return this.leitnerScheduler.filterCardsForReview(allUserCards, quizDate)
   }
 }
