@@ -20,7 +20,7 @@ export class CardService {
     const cardId = new CardId(crypto.randomUUID())
     const category = new CategoryValueObject(Category.FIRST)
 
-    const nextReviewDate = this.leitnerScheduler.calculateNextReviewDate(Category.FIRST)
+    const nextReviewDate = new Date()
 
     const card = new Card(cardId, question, answer, tag, category, userId, nextReviewDate)
     return await this.cardRepository.save(card)

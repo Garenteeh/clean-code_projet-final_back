@@ -72,7 +72,10 @@ export class LeitnerSchedulerService {
       return false
     }
 
-    const nextReviewDate = this.calculateNextReviewDate(card.category.value)
-    return nextReviewDate <= date
+    return card.nextReviewDate <= date
+  }
+
+  filterCardsForReview(cards: Card[], date: Date): Card[] {
+    return cards.filter((card) => this.shouldBeProposedAt(card, date))
   }
 }
