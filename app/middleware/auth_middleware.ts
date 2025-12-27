@@ -1,10 +1,24 @@
-import { HttpContext } from '@adonisjs/core/http'
-import { AuthService } from '#application/services/AuthService'
+import type { NextFn } from '@adonisjs/core/types/http'
+import { AuthService } from '#application/services/auth.service'
 
 const authService = new AuthService()
 
-export default async function authMiddleware({ request }: HttpContext, next: () => Promise<void>) {
-  const token = request.header('Authorization')
-  request.user = await authService.getUserFromToken(token)
-  await next()
+type HttpContext = {
+  request: {
+    header: (name: string) => string | undefined
+    user?: {
+      userId: string
+      username?: string
+    }
+  }
+}
+
+export default class AuthMiddleware {
+  async handle(ctx: HttpContext, next: NextFn) {
+    const { request } = ctx
+    const token = request.header('Authorization')
+    const user = await authService.getUserFromToken(token)
+    request.user = user || undefined
+    return next()
+  }
 }
