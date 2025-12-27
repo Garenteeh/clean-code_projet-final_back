@@ -1,7 +1,6 @@
 import { Card } from '#domain/entities/card'
 import { Category } from '#domain/value_objects/category.value_object'
 
-
 export class LeitnerSchedulerService {
   private readonly intervalsByCategory: Map<Category, number> = new Map([
     [Category.FIRST, 1],
@@ -32,7 +31,6 @@ export class LeitnerSchedulerService {
     }
   }
 
-
   private promoteCategory(currentCategory: Category): Category {
     const currentIndex = this.categories.indexOf(currentCategory)
 
@@ -50,7 +48,6 @@ export class LeitnerSchedulerService {
 
     return Category.DONE
   }
-
 
   private demoteCategory(currentCategory: Category): Category {
     if (currentCategory === Category.DONE) {

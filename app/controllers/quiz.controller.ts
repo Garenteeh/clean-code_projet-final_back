@@ -50,7 +50,10 @@ export default class QuizController {
       const cards = await quizService.getCardsForQuiz(userId, date)
       return response.ok(cards.map((card) => card.toJSON()))
     } catch (error) {
-      if (error instanceof Error && error.message === "Vous avez déjà fait un questionnaire aujourd'hui") {
+      if (
+        error instanceof Error &&
+        error.message === "Vous avez déjà fait un questionnaire aujourd'hui"
+      ) {
         return response.badRequest({
           error: "Vous avez déjà fait un questionnaire aujourd'hui",
         })

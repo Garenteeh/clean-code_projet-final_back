@@ -29,4 +29,3 @@ export class QuizDailyLimitServiceSingleton {
 
 export const quizDailyLimitService = new QuizDailyLimitServiceSingleton()
 export type QuizDailyLimitService = QuizDailyLimitServiceSingleton
-
