@@ -13,6 +13,12 @@ export class QuizService {
     const quizDate = date || new Date()
     const allUserCards = await this.cardRepository.findCardsForQuiz(userId, quizDate)
 
-    return this.leitnerScheduler.filterCardsForReview(allUserCards, quizDate)
+    if (allUserCards.length === 0) {
+      return []
+    }
+
+    const filteredCards = this.leitnerScheduler.filterCardsForReview(allUserCards, quizDate)
+
+    return filteredCards
   }
 }
