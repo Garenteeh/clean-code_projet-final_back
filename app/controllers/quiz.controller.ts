@@ -71,16 +71,18 @@ export default class QuizController {
     }
 
     const { cardId } = params
-    const { isValid } = request.only(['isValid'])
+    const { isValid, forceValidation } = request.only(['isValid', 'forceValidation'])
 
-    if (typeof isValid !== 'boolean') {
+    const finalIsValid = forceValidation === true ? true : isValid
+
+    if (typeof finalIsValid !== 'boolean') {
       return response.badRequest({
-        error: 'isValid doit être un booléen',
+        error: 'isValid doit être un booléen ou forceValidation doit être true',
       })
     }
 
     try {
-      await cardService.answerCard(cardId, isValid, userId)
+      await cardService.answerCard(cardId, finalIsValid, userId)
       return response.noContent()
     } catch (error) {
       if (error instanceof Error && error.message === 'Card not found') {
