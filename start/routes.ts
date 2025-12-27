@@ -12,14 +12,6 @@ import { middleware } from '#start/kernel'
 
 router.get('/', async () => 'It works!')
 
-router
-  .get('/protected', async ({ auth, response }) => {
-    return response.ok({
-      message: 'Vous êtes authentifié',
-      userId: auth?.userId,
-    })
-  })
-  .use(middleware.auth())
 
 router
   .group(() => {
