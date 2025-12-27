@@ -12,7 +12,6 @@ import { middleware } from '#start/kernel'
 
 router.get('/', async () => 'It works!')
 
-
 router
   .group(() => {
     router.get('/me', async ({ auth, response }) => {
