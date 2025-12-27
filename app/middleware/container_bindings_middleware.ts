@@ -1,5 +1,5 @@
 import { Logger } from '@adonisjs/core/logger'
-import { HttpContext } from '@adonisjs/core/http'
+import { HttpContext } from '@adonisjs/http-server'
 import type { NextFn } from '@adonisjs/core/types/http'
 
 /**

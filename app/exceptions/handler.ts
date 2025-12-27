@@ -1,5 +1,5 @@
 import app from '@adonisjs/core/services/app'
-import { HttpContext, ExceptionHandler } from '@adonisjs/core/http'
+import { HttpContext, ExceptionHandler } from '@adonisjs/http-server'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
   /**
