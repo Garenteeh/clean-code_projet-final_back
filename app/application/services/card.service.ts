@@ -2,9 +2,14 @@ import { Card } from '#domain/entities/card'
 import { CardId } from '#domain/value_objects/card_id.value_object'
 import { CategoryValueObject, Category } from '#domain/value_objects/category.value_object'
 import { CardRepositoryPort } from '#domain/ports/card_repository'
+import { LeitnerSchedulerService } from '#domain/services/leitner_scheduler.service'
 
 export class CardService {
-  constructor(private cardRepository: CardRepositoryPort) {}
+  private leitnerScheduler: LeitnerSchedulerService
+
+  constructor(private cardRepository: CardRepositoryPort) {
+    this.leitnerScheduler = new LeitnerSchedulerService()
+  }
 
   async createCard(
     question: string,
@@ -36,22 +41,7 @@ export class CardService {
       throw new Error('Card not found')
     }
 
-    // Logique simplifiée du système Leitner
-    let newCategory: Category
-    if (isValid) {
-      // Si bonne réponse, passer à la catégorie suivante
-      const currentCategory = card.category.value
-      const categories = Object.values(Category)
-      const currentIndex = categories.indexOf(currentCategory)
-      if (currentIndex < categories.length - 1) {
-        newCategory = categories[currentIndex + 1]
-      } else {
-        newCategory = Category.DONE
-      }
-    } else {
-      // Si mauvaise réponse, revenir à la première catégorie
-      newCategory = Category.FIRST
-    }
+    const newCategory = this.leitnerScheduler.getNextCategory(card.category.value, isValid)
 
     const updatedCard = new Card(
       card.id,

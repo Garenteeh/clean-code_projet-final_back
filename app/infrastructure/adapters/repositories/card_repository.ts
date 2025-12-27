@@ -1,6 +1,7 @@
 import { CardRepositoryPort } from '#domain/ports/card_repository'
 import { Card } from '#domain/entities/card'
 import { CardId } from '#domain/value_objects/card_id.value_object'
+import { Category } from '#domain/value_objects/category.value_object'
 
 export default class CardRepository implements CardRepositoryPort {
   private cards: Map<string, Card> = new Map()
@@ -29,7 +30,9 @@ export default class CardRepository implements CardRepositoryPort {
   }
 
   async findCardsForQuiz(userId: string, _date: Date): Promise<Card[]> {
-    return Array.from(this.cards.values()).filter((card) => card.userId === userId)
+    return Array.from(this.cards.values()).filter(
+      (card) => card.userId === userId && card.category.value !== Category.DONE
+    )
   }
 
   async update(card: Card): Promise<Card> {
