@@ -2,7 +2,7 @@ import { CardRepositoryPort } from '#domain/ports/card_repository'
 import { Card } from '#domain/entities/card'
 import { CardId } from '#domain/value_objects/card_id.value_object'
 
-export default class CardRepository implements CardRepositoryPort {
+class CardRepositorySingleton implements CardRepositoryPort {
   private cards: Map<string, Card> = new Map()
 
   async findAll(userId: string, tags?: string[]): Promise<Card[]> {
@@ -37,3 +37,7 @@ export default class CardRepository implements CardRepositoryPort {
     return card
   }
 }
+
+const cardRepositoryInstance = new CardRepositorySingleton()
+
+export default cardRepositoryInstance

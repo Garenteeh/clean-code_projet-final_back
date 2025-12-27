@@ -13,11 +13,22 @@ export class LeitnerSchedulerService {
   ])
 
   shouldReviewCard(card: Card, reviewDate: Date): boolean {
-    if (card.category.value === Category.DONE) {
+    if (!card) {
       return false
     }
 
-    if (card.category.value === Category.FIRST) {
+    if (!card.category) {
+      return false
+    }
+
+    const categoryValue = card.category.value
+    const categoryString = card.category.toString()
+
+    if (categoryValue === Category.DONE || categoryString === 'DONE') {
+      return false
+    }
+
+    if (categoryValue === Category.FIRST || categoryString === 'FIRST') {
       return true
     }
 
@@ -26,8 +37,7 @@ export class LeitnerSchedulerService {
     }
 
     const daysSinceLastReview = this.getDaysDifference(card.lastReviewedAt, reviewDate)
-
-    const reviewInterval = this.REVIEW_INTERVALS.get(card.category.value) || 1
+    const reviewInterval = this.REVIEW_INTERVALS.get(categoryValue) || 1
 
     return daysSinceLastReview >= reviewInterval
   }
