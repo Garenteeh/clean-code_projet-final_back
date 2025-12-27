@@ -1,55 +1,78 @@
-import { Card } from '../entities/card.js'
-import { Category } from '../value_objects/category.value_object.js'
+import { Card } from '#domain/entities/card'
+import { Category } from '#domain/value_objects/category.value_object'
+
 
 export class LeitnerSchedulerService {
-  private readonly REVIEW_INTERVALS: Map<Category, number> = new Map([
+  private readonly intervalsByCategory: Map<Category, number> = new Map([
     [Category.FIRST, 1],
     [Category.SECOND, 2],
-    [Category.THIRD, 4],
     [Category.FOURTH, 8],
     [Category.FIFTH, 16],
     [Category.SIXTH, 32],
     [Category.SEVENTH, 64],
+    [Category.DONE, 0],
   ])
 
-  shouldReviewCard(card: Card, reviewDate: Date): boolean {
-    if (!card) {
-      return false
+  private readonly categories = [
+    Category.FIRST,
+    Category.SECOND,
+    Category.THIRD,
+    Category.FOURTH,
+    Category.FIFTH,
+    Category.SIXTH,
+    Category.SEVENTH,
+    Category.DONE,
+  ]
+
+  getNextCategory(currentCategory: Category, isValid: boolean): Category {
+    if (isValid) {
+      return this.promoteCategory(currentCategory)
+    } else {
+      return this.demoteCategory(currentCategory)
     }
-
-    if (!card.category) {
-      return false
-    }
-
-    const categoryValue = card.category.value
-    const categoryString = card.category.toString()
-
-    if (categoryValue === Category.DONE || categoryString === 'DONE') {
-      return false
-    }
-
-    if (categoryValue === Category.FIRST || categoryString === 'FIRST') {
-      return true
-    }
-
-    if (!card.lastReviewedAt) {
-      return true
-    }
-
-    const daysSinceLastReview = this.getDaysDifference(card.lastReviewedAt, reviewDate)
-    const reviewInterval = this.REVIEW_INTERVALS.get(categoryValue) || 1
-
-    return daysSinceLastReview >= reviewInterval
   }
 
-  filterCardsForReview(cards: Card[], reviewDate: Date): Card[] {
-    return cards.filter((card) => this.shouldReviewCard(card, reviewDate))
+
+  private promoteCategory(currentCategory: Category): Category {
+    const currentIndex = this.categories.indexOf(currentCategory)
+
+    if (currentCategory === Category.DONE) {
+      return Category.DONE
+    }
+
+    if (currentCategory === Category.SEVENTH) {
+      return Category.DONE
+    }
+
+    if (currentIndex < this.categories.length - 1) {
+      return this.categories[currentIndex + 1]
+    }
+
+    return Category.DONE
   }
 
-  private getDaysDifference(startDate: Date, endDate: Date): number {
-    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate())
-    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate())
-    const diffTime = end.getTime() - start.getTime()
-    return Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+  private demoteCategory(currentCategory: Category): Category {
+    if (currentCategory === Category.DONE) {
+      return Category.DONE
+    }
+
+    return Category.FIRST
+  }
+
+  calculateNextReviewDate(category: Category, fromDate: Date = new Date()): Date {
+    const interval = this.intervalsByCategory.get(category) || 0
+    const nextDate = new Date(fromDate)
+    nextDate.setDate(nextDate.getDate() + interval)
+    return nextDate
+  }
+
+  shouldBeProposedAt(card: Card, date: Date): boolean {
+    if (card.category.value === Category.DONE) {
+      return false
+    }
+
+    const nextReviewDate = this.calculateNextReviewDate(card.category.value)
+    return nextReviewDate <= date
   }
 }

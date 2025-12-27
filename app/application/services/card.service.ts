@@ -2,9 +2,14 @@ import { Card } from '#domain/entities/card'
 import { CardId } from '#domain/value_objects/card_id.value_object'
 import { CategoryValueObject, Category } from '#domain/value_objects/category.value_object'
 import { CardRepositoryPort } from '#domain/ports/card_repository'
+import { LeitnerSchedulerService } from '#domain/services/leitner_scheduler.service'
 
 export class CardService {
-  constructor(private cardRepository: CardRepositoryPort) {}
+  private leitnerScheduler: LeitnerSchedulerService
+
+  constructor(private cardRepository: CardRepositoryPort) {
+    this.leitnerScheduler = new LeitnerSchedulerService()
+  }
 
   async createCard(
     question: string,
@@ -15,7 +20,9 @@ export class CardService {
     const cardId = new CardId(crypto.randomUUID())
     const category = new CategoryValueObject(Category.FIRST)
 
-    const card = new Card(cardId, question, answer, tag, category, userId, undefined)
+    const nextReviewDate = this.leitnerScheduler.calculateNextReviewDate(Category.FIRST)
+
+    const card = new Card(cardId, question, answer, tag, category, userId, nextReviewDate)
     return await this.cardRepository.save(card)
   }
 
@@ -36,19 +43,9 @@ export class CardService {
       throw new Error('Card not found')
     }
 
-    let newCategory: Category
-    if (isValid) {
-      const currentCategory = card.category.value
-      const categories = Object.values(Category)
-      const currentIndex = categories.indexOf(currentCategory)
-      if (currentIndex < categories.length - 1) {
-        newCategory = categories[currentIndex + 1]
-      } else {
-        newCategory = Category.DONE
-      }
-    } else {
-      newCategory = Category.FIRST
-    }
+    const newCategory = this.leitnerScheduler.getNextCategory(card.category.value, isValid)
+
+    const nextReviewDate = this.leitnerScheduler.calculateNextReviewDate(newCategory)
 
     const updatedCard = new Card(
       card.id,
@@ -57,7 +54,7 @@ export class CardService {
       card.tag,
       new CategoryValueObject(newCategory),
       card.userId,
-      new Date()
+      nextReviewDate
     )
 
     return await this.cardRepository.update(updatedCard)

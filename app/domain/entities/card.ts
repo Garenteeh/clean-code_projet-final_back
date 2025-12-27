@@ -9,7 +9,7 @@ export class Card {
     public readonly tag: string | undefined,
     public readonly category: CategoryValueObject,
     public readonly userId: string,
-    public readonly lastReviewedAt: Date | undefined = undefined
+    public readonly nextReviewDate: Date = new Date()
   ) {}
 
   toJSON() {
